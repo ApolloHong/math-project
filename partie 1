@@ -1,0 +1,133 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.colors import LogNorm
+
+
+def culculate_Snk(n , k):
+    '''
+
+    :param n: iteration time
+    :param k: power
+    :return:
+    '''
+    Snk = 0
+    for i in range(n+1):
+        Snk += i**k
+    return Snk
+
+
+def factoria(N):
+    if N == 0:
+        return 1
+    else:
+        N2=N
+        a=list(range(1,N+1))
+        while N2>1:
+            N1=N2%2; N2=N2//2+N1
+            for i in range(N2-N1):
+                a[i]*=a[N2+i]
+            a=a[0:N2]
+        return a[0]
+
+    # sum = 1
+    # for i in range(1,N+1):
+    #     sum *= i
+    # return sum
+
+
+def coefficient_binomial(p , q):
+    if p >= q >= 0:
+        Bpq = factoria(p)/ ( factoria(p-q) * factoria(q) )
+        return Bpq
+    else:
+        return 0
+        # neutre = p
+        # p = q
+        # q = neutre
+        # coefficient_binomial(p,q)
+
+
+def montrez1(n , p):
+    def sigma(p,n):
+        s = 0
+        for k in range(p):
+            s += coefficient_binomial(p+1,k) * culculate_Snk(n,k)
+        return s
+    gauche = (p+1)*culculate_Snk(n,p)
+    droite = (n+1)**(p+1) - sigma(p,n)
+    return gauche - droite
+    # if gauche == droite:
+    #     print('vrai')
+    # else:
+    #     print('fausse')
+
+
+def generate_coefficient_matrix1(n):
+    M = np.zeros((n,n))
+    for i in range(n):
+        for j in range(i+1):
+            M[i][j] = coefficient_binomial(i,j)
+    return M
+
+
+def generate_coefficient_matrix2(n):
+    M = np.zeros((n,n))
+    for i in range(n):
+        for j in range(i+1):
+            M[i][j] = ((-1)**(i-j)) * coefficient_binomial(i,j)
+    return M
+
+
+def montrez2(n):
+    M1 = generate_coefficient_matrix1(n)
+    M2 = generate_coefficient_matrix2(n)
+    # if  M1 @ M2 == np.eye(n):
+    #     print('vrai')
+    return M1 @ M2
+
+
+
+def plot_matrice():
+    Z1 = montrez2(10)
+    Z2 = np.eye(11)
+    plt.rcParams['figure.figsize'] = [2,4]
+    fig, (ax0, ax1) = plt.subplots(2, 1)
+
+    c = ax0.pcolor(Z1)
+    ax0.set_title('matrice qu\'on a')
+
+    c = ax1.pcolor(Z2)
+    ax1.set_title('matrice d\'identite')
+
+    fig.tight_layout()
+    plt.show()
+
+
+
+# print(coefficient_binomial(0,0))
+# print(generate_coefficient_matrix1(10),generate_coefficient_matrix2(10))
+# plot_matrice()
+
+
+sum = []
+for i in range(1000):
+    for j in range(5):
+        if montrez1(i,j) !=0:
+            sum.append((i,j))
+print(sum)
+
+# def coefficient_binomial(p , q):
+#     s = [[0 for i in range(p + 1)] for j in range(q + 1)]
+#     for i in range(1, q + 1):
+#         s[i][0] = 1
+#     for j in range(1, p + 1):
+#         s[j][j] = 1
+#     for x in range(2, q + 1):
+#         for y in range(1, p + 1):
+#             if x >= y:
+#                 s[x][y] = s[x - 1][y] + s[x - 1][y - 1]
+#     return s[p][q]
+
+
+# print(coefficient_binomial(2,4))
+
